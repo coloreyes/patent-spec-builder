@@ -1,0 +1,19 @@
+{
+  "name": "patent-spec-builder",
+  "version": "1.0.0",
+  "description": "将技术交底书或技术论文转换为标准专利说明书格式（含说明书摘要和说明书），输出贴合CNIPA投稿规范的Word文档",
+  "platforms": ["claude-code", "codex"],
+  "entry_point": "shared/entry.py",
+  "system_prompt_file": "prompts/spec_builder.md",
+  "triggers": {
+    "claude-code": ["专利说明书", "说明书生成", "patent-spec", "spec-builder"],
+    "codex": ["生成专利说明书", "generate patent specification", "patent spec"]
+  },
+  "dependencies": {
+    "python": ["python-docx>=1.0.0", "lxml>=4.9.0"]
+  },
+  "usage": {
+    "claude-code": "将本目录放置于 ~/.claude/skills/patent-spec-builder/ 下，在对话中提及触发词即可",
+    "codex": "将 prompts/spec_builder.md 内容作为 system prompt 传入 API，通过 shared/entry.py 处理输入输出"
+  }
+}
