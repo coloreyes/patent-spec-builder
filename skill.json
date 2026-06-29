@@ -1,0 +1,7 @@
+{
+  "name": "patent-spec-builder",
+  "version": "1.0.0",
+  "description": "将专利交底书或技术论文转换为标准专利说明书格式（含说明书摘要和说明书），输出贴合CNIPA投稿规范的Word文档",
+  "triggers": ["专利说明书", "说明书生成", "patent-spec", "spec-builder"],
+  "entry_prompt": "prompts/entry.md"
+}
