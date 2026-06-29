@@ -1,0 +1,43 @@
+# Codex Skill 配置 - 自动触发模式
+# 此配置使 Codex Agent 能够像 Claude Code 一样自动判断何时使用此 Skill
+
+name: patent-spec-builder
+version: 1.0.0
+description: 将技术交底书或技术论文转换为标准专利说明书格式
+
+# 自动触发条件 - Codex Agent 根据这些关键词/意图自动使用 Skill
+triggers:
+  keywords:
+    - 专利说明书
+    - 说明书生成
+    - 生成专利
+    - 专利交底书转换
+    - patent specification
+    - generate patent
+  intents:
+    - "用户想要生成专利说明书"
+    - "用户想要转换交底书为说明书"
+    - "用户需要 CNIPA 格式的专利文档"
+
+# 系统提示 - Codex Agent 自动加载
+system_prompt_file: prompts/spec_builder.md
+
+# 工具配置 - Agent 自动调用
+tools:
+  - name: omath_converter
+    path: tools/omath_converter.py
+    description: 将 LaTeX 公式转换为 Word OMath 格式
+
+# 输出配置
+output:
+  format: docx
+  naming: "{案件名}_{YYYYMMDDHHmmss}"
+  files:
+    - 说明书摘要.docx
+    - 说明书.docx
+
+# 依赖
+dependencies:
+  python:
+    - python-docx>=1.0.0
+    - lxml>=4.9.0
