@@ -1,4 +1,23 @@
-"""Convert LaTeX-like formulas to Word OMath XML."""
+"""Convert LaTeX-like formulas to Word OMath XML.
+
+Usage:
+    from omath_converter import formula_to_omath
+    from docx import Document
+
+    doc = Document()
+    p = doc.add_paragraph()
+    p._p.append(formula_to_omath(r"CS = \alpha \cdot C_{\mathrm{com}} + \beta \cdot C_{\mathrm{coo}}"))
+    doc.save("output.docx")
+
+Supported LaTeX features:
+    - Greek letters: \alpha, \beta, \Delta, \eta, etc.
+    - Symbols: \cdot, \times, \leq, \geq, \sum, etc.
+    - Fractions: \frac{numerator}{denominator}
+    - Subscripts: x_i, C_{\mathrm{com}}
+    - Superscripts: x^2, R_i^{(t)}
+    - Combined: \bar{R}_{ij}^{(t)}
+    - Upright text: \mathrm{clip}, \mathrm{total}
+"""
 from lxml import etree
 
 MATH_NS = "http://schemas.openxmlformats.org/officeDocument/2006/math"
