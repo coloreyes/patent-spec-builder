@@ -47,29 +47,46 @@ claude
 claude "请根据 ./专利/你的交底书.md 生成专利说明书"
 ```
 
-### Codex CLI
+### Codex 详细使用指南
+
+#### 1. 使用入口脚本（最简单）
 
 ```bash
-# 方式 1: 使用入口脚本
+# 安装依赖
+pip install python-docx lxml
+
+# 运行入口脚本
 python3 shared/entry.py \
   --input ./专利/你的交底书.md \
   --output ./专利/你的案件/
-
-# 方式 2: 使用 API 调用示例
-export OPENAI_API_KEY=your_key
-bash examples/codex_api_example.sh ./专利/你的交底书.md ./输出/
 ```
 
-### Codex API
+#### 2. 使用 API 调用示例脚本
 
 ```bash
+# 设置 API Key
+export OPENAI_API_KEY=your_api_key_here
+
+# 运行示例脚本
+bash examples/codex_api_example.sh \
+  ./专利/你的交底书.md \
+  ./专利/你的案件/
+```
+
+#### 3. 直接使用 curl 调用 API
+
+```bash
+# 设置变量
+export OPENAI_API_KEY=your_api_key_here
+INPUT_FILE="./专利/你的交底书.md"
+
 # 读取 spec_builder.md 作为系统提示
 SYSTEM_PROMPT=$(cat prompts/spec_builder.md)
 
-# 读取输入文件
-INPUT_CONTENT=$(cat ./专利/你的交底书.md)
+# 读取输入文件内容
+INPUT_CONTENT=$(cat "$INPUT_FILE")
 
-# 调用 API
+# 调用 Codex API
 curl https://api.openai.com/v1/chat/completions \
   -H "Authorization: Bearer $OPENAI_API_KEY" \
   -H "Content-Type: application/json" \
@@ -77,10 +94,90 @@ curl https://api.openai.com/v1/chat/completions \
     \"model\": \"o3\",
     \"messages\": [
       {\"role\": \"system\", \"content\": \"$SYSTEM_PROMPT\"},
-      {\"role\": \"user\", \"content\": \"请根据以下交底书内容生成专利说明书:\n\n$INPUT_CONTENT\"}
+      {\"role\": \"user\", \"content\": \"请根据以下交底书内容生成专利说明书（含说明书摘要和说明书两份Word文档）:\n\n$INPUT_CONTENT\"}
     ]
   }"
 ```
+
+#### 4. 使用 Python 脚本调用
+
+```python
+import openai
+import os
+
+# 设置 API Key
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+# 读取系统提示
+with open("prompts/spec_builder.md", "r", encoding="utf-8") as f:
+    system_prompt = f.read()
+
+# 读取输入文件
+with open("./专利/你的交底书.md", "r", encoding="utf-8") as f:
+    input_content = f.read()
+
+# 调用 API
+response = openai.chat.completions.create(
+    model="o3",
+    messages=[
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": f"请根据以下交底书内容生成专利说明书:\n\n{input_content}"}
+    ]
+)
+
+# 输出结果
+print(response.choices[0].message.content)
+```
+
+#### 5. 在 Codex CLI 中使用
+
+```bash
+# 启动 Codex CLI
+codex
+
+# 在对话中输入:
+# 请将 prompts/spec_builder.md 的内容作为系统提示，
+# 然后根据 ./专利/你的交底书.md 生成专利说明书
+
+# 或者直接运行入口脚本:
+python3 shared/entry.py \
+  --input ./专利/你的交底书.md \
+  --output ./专利/你的案件/
+```
+
+#### 6. 完整工作流（推荐）
+
+```bash
+# 步骤 1: 克隆仓库
+git clone https://github.com/coloreyes/patent-spec-builder.git
+cd patent-spec-builder
+
+# 步骤 2: 安装依赖
+pip install python-docx lxml
+
+# 步骤 3: 设置 API Key
+export OPENAI_API_KEY=your_api_key_here
+
+# 步骤 4: 准备输入文件
+mkdir -p ./专利/你的案件/
+cp ./你的交底书.md ./专利/你的案件/
+
+# 步骤 5: 生成说明书
+bash examples/codex_api_example.sh \
+  ./专利/你的案件/交底书.md \
+  ./专利/你的案件/
+
+# 步骤 6: 查看输出
+ls ./专利/你的案件/*说明书*.docx
+```
+
+#### 7. 注意事项
+
+- **模型选择**: 推荐使用 `o3` 或 `o4-mini` 模型，它们对复杂指令的理解能力更强
+- **上下文长度**: 交底书较长时，确保模型支持足够的上下文长度
+- **依赖安装**: 生成 Word 文档需要 `python-docx` 和 `lxml`，请提前安装
+- **输出路径**: 输出文件默认保存在 `--output` 指定的目录中
+- **API 限流**: 如果交底书较大，可能会触发 API 限流，建议分段处理或增加重试机制
 
 ### 完整工作流（推荐）
 
